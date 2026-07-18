@@ -13,6 +13,8 @@ import {saveUserSession } from "../utils/userSession";
 import ProgressBar from "../components/ProgressBar";
 import LevelComplete from "../components/LevelComplete";
 import Loading from "../components/Loading";
+import {addFavoritePhrases,removeItemFromFavoritePhrases,getFavoritePhrases} from "../utils/favoritePhrases";
+import FavoriteStar from "../components/ButtonStar";
 
 
 interface ExerciseProps {
@@ -23,6 +25,7 @@ interface ExerciseProps {
 
 function Exercise({ languagePairId, level, onBack }: ExerciseProps) {
   const [questions, setQuestions] = useState<ExerciseQuestion[] | null>(null);
+  const [favoritePhraseKey, setFavoritePhraseKey] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +41,13 @@ function Exercise({ languagePairId, level, onBack }: ExerciseProps) {
     setIsFinished(false);
     setCurrentIndex(0);
     setCorrectCount(0);
+    const favorites= getFavoritePhrases();
+    if(favorites && Object.keys(favorites).length>9){
+      setFavoritePhraseKey(Object.keys(favorites));
+      setQuestions(Object.values(favorites));
+      setIsLoading(false);
+      return;
+    }
     downloadLevel(currentLevel)
       .then((rawItems) => {
         const normalizedItems = normalizeLevelItems(rawItems, sourceLang, targetLang);
@@ -73,7 +83,16 @@ const [source, target] = languagePairId.split("-") as [LanguageCode, LanguageCod
       selectedLanguagePair: { id: `${languagePairId}`, source: sourceLang, target: targetLang },
       selectedLevel: currentLevel + 1,
     });
-   
+  }
+
+  const handleFavoritePhrase = () => {
+    // Implement the logic to save the favorite phrase
+    const currentQuestion = questions ? questions[currentIndex] : null;;
+    addFavoritePhrases(currentQuestion as ExerciseQuestion);
+  }
+  const handleRemoveFavoritePhrase = () => {
+      const keyToRemove = favoritePhraseKey[currentIndex];
+      removeItemFromFavoritePhrases(keyToRemove);
   }
 
 
@@ -110,14 +129,25 @@ const [source, target] = languagePairId.split("-") as [LanguageCode, LanguageCod
       />
     );
   }
-
   const currentQuestion = questions[currentIndex];
 
   return (
     <div className="min-h-screen flex flex-col px-4 py-6 bg-gray-50">
       <div className="flex items-center justify-between mb-6">
         <BackArrow onClick={onBack} />
+        
+        
         <ProgressBar progress={currentIndex} max={questions.length} />
+        <FavoriteStar
+          isFavorited={favoritePhraseKey.length > 0}
+          onClick={() => {
+            if (favoritePhraseKey.length > 0) {
+              handleRemoveFavoritePhrase();
+            } else {
+              handleFavoritePhrase();
+            }
+          }}
+        />
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center">

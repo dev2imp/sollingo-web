@@ -63,6 +63,7 @@ function FlipCard({ question, onAnswered }: FlipCardProps) {
   const handleNext = () => {
    onAnswered(question.isStatementTrue === isCorrect);    
   }
+  
 
   return (
     <div className="w-full max-w-sm flex flex-col items-center gap-6">

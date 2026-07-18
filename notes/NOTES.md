@@ -2,6 +2,20 @@
     we need to make Progressbar nicer now it shows the number but 
     we need to show the progress bar and the level 
     later we  might add life too or star to collect etc 
+> Feature: Phrase Mastery Tracking (Like / Dislike System)
+###    What it does:
+    After answering a question, the user can mark the phrase they just practiced as a favorite. If they favorite it, we will keep showing it. If they don't favorite it, we assume they've learned it and won't show it again.
+###    How to Implement:
+    the local storage cache will be used
+    as the users sees the first level and doesn't respond with favorite
+    the app will continue to work normally, but if they click the favorite button
+    then we will save the word, and if number of favorited phrases are
+    more than 10 or 10 then we will keep showing the favorited phrases until
+    they unfavorite one and the number drops to 9.
+    if the number is less than 10 then we will get new level and show to user. 
+    
+
+
 > FlipCard : 
     user sees text in spoken language 
     they listens it if they know they directly type 

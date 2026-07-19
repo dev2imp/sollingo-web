@@ -9,5 +9,5 @@ git push -u origin main
 
 # Add Some Updates
 git add .
-git commit -m "Add screenshots and update README"
+git commit -m "Favorites were added"
 git push

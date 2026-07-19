@@ -1,17 +1,18 @@
 import type { ExerciseQuestion } from "../services/questionSelector";
 
-
+export const FAVORITE_REVIEW_THRESHOLD = 10;
 const FAVORITE_PHRASES_KEY = "sollingo_favorite_phrases";
 
 
 function generateId(): string {
   return Math.random().toString(36).slice(2, 10);
 }
-export function addFavoritePhrases(item: ExerciseQuestion): void {
+export function addFavoritePhrases(item: ExerciseQuestion): string {
      const id = generateId();
      const favorites = getFavoritePhrases();
      favorites[id] = item;
      localStorage.setItem(FAVORITE_PHRASES_KEY, JSON.stringify(favorites));
+     return id;
 }
 
 export function getFavoritePhrases(): Record<string, ExerciseQuestion> {

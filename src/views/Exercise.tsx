@@ -13,7 +13,13 @@ import {saveUserSession } from "../utils/userSession";
 import ProgressBar from "../components/ProgressBar";
 import LevelComplete from "../components/LevelComplete";
 import Loading from "../components/Loading";
-import {addFavoritePhrases,removeItemFromFavoritePhrases,getFavoritePhrases} from "../utils/favoritePhrases";
+import {
+  addFavoritePhrases,
+  removeItemFromFavoritePhrases,
+  getFavoritePhrases,
+  FAVORITE_REVIEW_THRESHOLD,
+}
+ from "../utils/favoritePhrases";
 import FavoriteStar from "../components/ButtonStar";
 
 
@@ -32,20 +38,21 @@ function Exercise({ languagePairId, level, onBack }: ExerciseProps) {
   const [error, setError] = useState<string | null>(null);
   const [isFinished, setIsFinished] = useState(false);
   const [currentLevel, setcurrentLevel] = useState(level);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
         const [sourceLang, targetLang] = languagePairId.split("-") as [LanguageCode, LanguageCode];
-
     setIsLoading(true);
     setError(null);
     setIsFinished(false);
     setCurrentIndex(0);
     setCorrectCount(0);
     const favorites= getFavoritePhrases();
-    if(favorites && Object.keys(favorites).length>9){
+    if(favorites && Object.keys(favorites).length>=FAVORITE_REVIEW_THRESHOLD){
       setFavoritePhraseKey(Object.keys(favorites));
       setQuestions(Object.values(favorites));
       setIsLoading(false);
+      setIsFavorited(true);
       return;
     }
     downloadLevel(currentLevel)
@@ -63,6 +70,7 @@ function Exercise({ languagePairId, level, onBack }: ExerciseProps) {
   }, [languagePairId, currentLevel]);
 
   const handleAnswered = (isCorrect: boolean) => {
+    setIsFavorited(favoritePhraseKey.length >= FAVORITE_REVIEW_THRESHOLD);
     if (isCorrect) {
       setCorrectCount((prev) => prev + 1);
     }
@@ -87,7 +95,7 @@ const [source, target] = languagePairId.split("-") as [LanguageCode, LanguageCod
 
   const handleFavoritePhrase = () => {
     // Implement the logic to save the favorite phrase
-    const currentQuestion = questions ? questions[currentIndex] : null;;
+    const currentQuestion = questions ? questions[currentIndex] : null;
     addFavoritePhrases(currentQuestion as ExerciseQuestion);
   }
   const handleRemoveFavoritePhrase = () => {
@@ -139,11 +147,13 @@ const [source, target] = languagePairId.split("-") as [LanguageCode, LanguageCod
         
         <ProgressBar progress={currentIndex} max={questions.length} />
         <FavoriteStar
-          isFavorited={favoritePhraseKey.length > 0}
+          isFavorited={isFavorited}
           onClick={() => {
+            setIsFavorited(favoritePhraseKey.length > 9);
             if (favoritePhraseKey.length > 0) {
               handleRemoveFavoritePhrase();
             } else {
+               setIsFavorited(true);
               handleFavoritePhrase();
             }
           }}
